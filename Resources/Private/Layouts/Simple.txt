@@ -1,0 +1,3 @@
+<f:render section="content" />
+-----------------------------------
+<f:render partial="Footer" />
