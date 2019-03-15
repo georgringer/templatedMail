@@ -1,0 +1,37 @@
+{
+  "name": "georgringer/templatedmail",
+  "type": "typo3-cms-extension",
+  "description": "Better mail templates",
+  "keywords": [
+    "TYPO3",
+    "extension",
+    "mail",
+    "fluid"
+  ],
+  "authors": [
+    {
+      "name": "Georg Ringer",
+      "role": "Developer",
+      "homepage": "https://ringer.it"
+    }
+  ],
+  "license": ["GPL-2.0-or-later"],
+  "require": {
+    "typo3/cms-core": "^8.7.13|| ^9.5.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "GeorgRinger\\Templatedmail\\": "Classes"
+    }
+  },
+  "replace": {
+    "templatedmail": "self.version",
+    "typo3-ter/templatedmail": "self.version"
+  },
+  "extra": {
+    "typo3/cms": {
+      "cms-package-dir": "{$vendor-dir}/typo3/cms",
+      "web-dir": ".Build/Web"
+    }
+  }
+}

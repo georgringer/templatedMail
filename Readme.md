@@ -1,7 +1,8 @@
 # TYPO3 extension `templatedMail`
 
 This extension is a proof of concept how to improve the templating of mails.
-Benefits
+
+**Current Benefits**
 
 - All mails share the same layout which makes it easier to style mails
 - It is faster to create nice mails
@@ -44,3 +45,8 @@ $templatedMail->addTo('reciepient@example.org')
     ->addContentAsRaw('<h1>Hello</h1> and more text', TemplatedEmail::FORMAT_HTML)
     ->send();
 ```
+
+## Requirements
+
+- TYPO3 8.7 / 9.5 LTS
+- GPL License
