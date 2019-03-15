@@ -20,7 +20,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class TemplateCommand extends Command
@@ -45,16 +44,11 @@ class TemplateCommand extends Command
         $templatedMail->addTo('dummy@example.org')
             ->addFrom('noreply@fo.com', 'Test')
             ->setSubject('A mail')
-//            ->setTemplateRootPaths(
-//                ['']
-//            )
-//            ->addContentAsFluidTemplate('Simple', ['title' => 'My title'], TemplatedEmail::FORMAT_HTML)
+//            ->addContentAsFluidTemplate('Examples/Simple', ['title' => 'My title'], TemplatedEmail::FORMAT_HTML)
 //            ->addContentAsFluidTemplateFile('EXT:templatedmail/Resources/Private/Templates/Examples/Example.html', ['title' => 'My title'], TemplatedEmail::FORMAT_HTML)
-//            ->addContentAsFluidTemplate('Simple', ['title' => 'My title'], TemplatedEmail::FORMAT_PLAIN)
-//            ->addContentAsRaw('das is mir wurscht', TemplatedEmail::FORMAT_PLAIN)
-//            ->addContentAsRaw('<h1>das</h1> is mir wurscht', TemplatedEmail::FORMAT_HTML)
-//        ->setBody('<html><body>html test content</body></html>', 'text/html')
-//        ->addPart('plain test content', 'text/plain')
+//            ->addContentAsFluidTemplate('Examples/Simple', ['title' => 'My title'], TemplatedEmail::FORMAT_PLAIN)
+//            ->addContentAsRaw('basic example', TemplatedEmail::FORMAT_PLAIN)
+//            ->addContentAsRaw('<h1>a</h1> basic example', TemplatedEmail::FORMAT_HTML)
             ->send();
 
         $io = new SymfonyStyle($input, $output);
