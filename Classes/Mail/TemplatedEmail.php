@@ -20,17 +20,11 @@ class TemplatedEmail extends MailMessage
     /** @var array */
     protected $templateRootPaths = [];
 
-    /** @var string */
-    protected $content = '';
-
     /** @var StandaloneView */
     protected $view;
 
-    protected $templateFormat = 'text/html';
-
     public const FORMAT_HTML = 'html';
     public const FORMAT_PLAIN = 'txt';
-
 
     /**
      * @param array $layoutRootPaths
@@ -113,8 +107,6 @@ class TemplatedEmail extends MailMessage
 
         $css = file_get_contents(ExtensionManagementUtility::extPath('templatedmail') . 'Resources/Public/Css/simple.css');
         $this->view->assign('css', $css);
-
-
     }
 
     protected function getDefaultVariables()
