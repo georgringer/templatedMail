@@ -7,9 +7,31 @@ This extension is a proof of concept how to improve the templating of mails.
 - All mails share the same layout which makes it easier to style mails
 - It is faster to create nice mails
 
-## Examples
 
-Some example usages
+## Usage
+
+```
+$templatedMail = GeneralUtility::makeInstance(TemplatedEmail::class);
+$templatedMail->addTo('dummy@example.org')
+    ->addFrom('noreply@fo.com', 'Test')
+    ->setSubject('A mail')
+    ->addContentAsRaw('Hello' . LF . 'an example', TemplatedEmail::FORMAT_PLAIN)
+    ->addContentAsRaw('<h1>Hello</h1> an example', TemplatedEmail::FORMAT_HTML)
+    ->send();
+```
+The example can also be called by CLI with `./web/bin/typo3 mail:template`.
+
+This example will send one mail with the following parts:
+
+**HTML part**
+
+![HTML](Resources/Public/Screenshots/example-html.png)
+
+**Plain text part**
+
+![Plain](Resources/Public/Screenshots/example-txt.png)
+
+## Further examples
 
 ### Using A template file
 
@@ -21,19 +43,6 @@ $templatedMail->addTo('reciepient@example.org')
     ->addContentAsFluidTemplateFile('EXT:templatedmail/Resources/Private/Templates/Examples/Example.html', ['title' => 'My title'], TemplatedEmail::FORMAT_HTML)
     ->send();
 ```
-
-### Using final content
-
-```
-$templatedMail = GeneralUtility::makeInstance(TemplatedEmail::class);
-$templatedMail->addTo('reciepient@example.org')
-    ->addFrom('noreply@fo.com', 'Test')
-    ->setSubject('A mail')
-    ->addContentAsRaw('Some basic text', TemplatedEmail::FORMAT_PLAIN)
-    ->addContentAsRaw('<h1>Hello</h1> and more text', TemplatedEmail::FORMAT_HTML)
-    ->send();
-```
-
 
 ### Using A template
 

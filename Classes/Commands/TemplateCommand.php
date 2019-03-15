@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace GeorgRinger\Templatedmail\Commands;
 
@@ -44,11 +45,8 @@ class TemplateCommand extends Command
         $templatedMail->addTo('dummy@example.org')
             ->addFrom('noreply@fo.com', 'Test')
             ->setSubject('A mail')
-//            ->addContentAsFluidTemplate('Examples/Simple', ['title' => 'My title'], TemplatedEmail::FORMAT_HTML)
-//            ->addContentAsFluidTemplateFile('EXT:templatedmail/Resources/Private/Templates/Examples/Example.html', ['title' => 'My title'], TemplatedEmail::FORMAT_HTML)
-//            ->addContentAsFluidTemplate('Examples/Simple', ['title' => 'My title'], TemplatedEmail::FORMAT_PLAIN)
-//            ->addContentAsRaw('basic example', TemplatedEmail::FORMAT_PLAIN)
-//            ->addContentAsRaw('<h1>a</h1> basic example', TemplatedEmail::FORMAT_HTML)
+            ->addContentAsRaw('Hello' . LF . 'an example', TemplatedEmail::FORMAT_PLAIN)
+            ->addContentAsRaw('<h1>Hello</h1> an example', TemplatedEmail::FORMAT_HTML)
             ->send();
 
         $io = new SymfonyStyle($input, $output);

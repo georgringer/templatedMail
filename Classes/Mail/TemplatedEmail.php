@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace GeorgRinger\Templatedmail\Mail;
 
@@ -10,6 +11,8 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
 
 class TemplatedEmail extends MailMessage
 {
+    public const FORMAT_HTML = 'html';
+    public const FORMAT_PLAIN = 'txt';
 
     /** @var array */
     protected $layoutRootPaths = [];
@@ -22,9 +25,6 @@ class TemplatedEmail extends MailMessage
 
     /** @var StandaloneView */
     protected $view;
-
-    public const FORMAT_HTML = 'html';
-    public const FORMAT_PLAIN = 'txt';
 
     /**
      * @param array $layoutRootPaths
@@ -50,7 +50,7 @@ class TemplatedEmail extends MailMessage
         $this->templateRootPaths = $templateRootPaths;
     }
 
-    public function addContentAsFluidTemplate(string $templateName, array $variables = [], string $format = self::FORMAT_HTML)
+    public function addContentAsFluidTemplate(string $templateName, array $variables = [], string $format = self::FORMAT_HTML): TemplatedEmail
     {
         $this->init($format);
         $this->view->setTemplate($templateName . '.' . $format);
@@ -60,7 +60,7 @@ class TemplatedEmail extends MailMessage
         return $this;
     }
 
-    public function addContentAsFluidTemplateFile(string $templateFile, array $variables = [], string $format = self::FORMAT_HTML)
+    public function addContentAsFluidTemplateFile(string $templateFile, array $variables = [], string $format = self::FORMAT_HTML): TemplatedEmail
     {
         $this->init($format);
         $this->view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName($templateFile));
@@ -70,7 +70,7 @@ class TemplatedEmail extends MailMessage
         return $this;
     }
 
-    public function addContentAsRaw(string $content, string $format = self::FORMAT_HTML, string $templateName = 'Raw')
+    public function addContentAsRaw(string $content, string $format = self::FORMAT_HTML, string $templateName = 'Raw'): TemplatedEmail
     {
         $this->init($format);
         $this->view->setTemplate($templateName . '.' . $format);
@@ -80,12 +80,14 @@ class TemplatedEmail extends MailMessage
         return $this;
     }
 
-    protected function addContent(string $format, string $content)
+    protected function addContent(string $format, string $content): void
     {
         if ($format === self::FORMAT_HTML) {
             $this->setBody($content, 'text/html');
-        } else {
+        } elseif ($format === self::FORMAT_PLAIN) {
             $this->addPart($content, 'text/plain');
+        } else {
+            throw new \UnexpectedValueException(sprintf('Given format "%s" is unknown', $format), 1552682965);
         }
     }
 
@@ -109,7 +111,7 @@ class TemplatedEmail extends MailMessage
         $this->view->assign('css', $css);
     }
 
-    protected function getDefaultVariables()
+    protected function getDefaultVariables(): array
     {
         return [
             'default' => [
