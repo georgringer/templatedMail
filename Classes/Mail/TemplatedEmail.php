@@ -4,9 +4,14 @@ declare(strict_types=1);
 namespace GeorgRinger\Templatedmail\Mail;
 
 
+use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Mail\MailMessage;
+use TYPO3\CMS\Core\Routing\SiteMatcher;
+use TYPO3\CMS\Core\Site\Entity\Site;
+use TYPO3\CMS\Core\Site\Entity\SiteInterface;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\MathUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
 class TemplatedEmail extends MailMessage
@@ -25,6 +30,9 @@ class TemplatedEmail extends MailMessage
 
     /** @var StandaloneView */
     protected $view;
+
+    /** @var SiteInterface */
+    protected $site;
 
     /**
      * @param array $layoutRootPaths
@@ -48,6 +56,14 @@ class TemplatedEmail extends MailMessage
     public function setTemplateRootPaths(array $templateRootPaths): void
     {
         $this->templateRootPaths = $templateRootPaths;
+    }
+
+    /**
+     * @param SiteInterface $site
+     */
+    public function setSite(SiteInterface $site): void
+    {
+        $this->site = $site;
     }
 
     public function addContentAsFluidTemplate(string $templateName, array $variables = [], string $format = self::FORMAT_HTML): TemplatedEmail
@@ -92,12 +108,31 @@ class TemplatedEmail extends MailMessage
     }
 
 
-    protected function init(string $format)
+    protected function init(string $format): void
     {
-        $path = GeneralUtility::getFileAbsFileName('EXT:templatedmail/Resources/Private/');
-        $this->templateRootPaths = [$path . 'Templates/'];
-        $this->layoutRootPaths = [$path . 'Layouts/'];
-        $this->partialRootPaths = [$path . 'Partials/'];
+        $site = $this->site ?: $this->getCurrentSite();
+        if ($site) {
+            $configuration = $site->getConfiguration();
+            if (isset($configuration['templatedMail'])) {
+                $templatePath = $configuration['templatedMail']['templateRootPath'] ?? '';
+                if ($templatePath) {
+                    $this->templateRootPaths = [$templatePath];
+                }
+                $partialPath = $configuration['templatedMail']['partialRootPath'] ?? '';
+                if ($partialPath) {
+                    $this->partialRootPaths = [$partialPath];
+                }
+                $layoutPath = $configuration['templatedMail']['layoutRootPath'] ?? '';
+                if ($layoutPath) {
+                    $this->layoutRootPaths = [$layoutPath];
+                }
+            }
+        } else {
+            $path = GeneralUtility::getFileAbsFileName('EXT:templatedmail/Resources/Private/');
+            $this->templateRootPaths = [$path . 'Templates/'];
+            $this->layoutRootPaths = [$path . 'Layouts/'];
+            $this->partialRootPaths = [$path . 'Partials/'];
+        }
 
         $this->view = GeneralUtility::makeInstance(StandaloneView::class);
         $this->view->setLayoutRootPaths($this->layoutRootPaths);
@@ -109,6 +144,23 @@ class TemplatedEmail extends MailMessage
 
         $css = file_get_contents(ExtensionManagementUtility::extPath('templatedmail') . 'Resources/Public/Css/simple.css');
         $this->view->assign('css', $css);
+    }
+
+    protected function getCurrentSite(): ?SiteInterface
+    {
+        if ($GLOBALS['TYPO3_REQUEST'] instanceof ServerRequestInterface) {
+            return $GLOBALS['TYPO3_REQUEST']->getAttribute('site', null);
+        }
+        if (MathUtility::canBeInterpretedAsInteger($GLOBALS['TSFE']->id) && $GLOBALS['TSFE']->id > 0) {
+            $matcher = GeneralUtility::makeInstance(SiteMatcher::class);
+            try {
+                $site = $matcher->matchByPageId((int)$GLOBALS['TSFE']->id);
+            } catch (SiteNotFoundException $e) {
+                $site = null;
+            }
+            return $site;
+        }
+        return null;
     }
 
     protected function getDefaultVariables(): array

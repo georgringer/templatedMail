@@ -21,6 +21,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use TYPO3\CMS\Core\Exception\SiteNotFoundException;
+use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class TemplateCommand extends Command
@@ -42,6 +44,10 @@ class TemplateCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $templatedMail = GeneralUtility::makeInstance(TemplatedEmail::class);
+        $site = $this->getSiteByName('master');
+        if ($site) {
+            $templatedMail->setSite($site);
+        }
         $templatedMail->addTo('dummy@example.org')
             ->addFrom('noreply@fo.com', 'Test')
             ->setSubject('A mail')
@@ -51,5 +57,16 @@ class TemplateCommand extends Command
 
         $io = new SymfonyStyle($input, $output);
         $io->success('Done');
+    }
+
+    protected function getSiteByName(string $identifier)
+    {
+        $site = null;
+        try {
+            $site = GeneralUtility::makeInstance(SiteFinder::class)->getSiteByIdentifier($identifier);
+        } catch (SiteNotFoundException $e) {
+
+        }
+        return $site;
     }
 }

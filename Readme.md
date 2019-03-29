@@ -57,6 +57,19 @@ $templatedMail->addTo('dummy@example.org')
     ->send();
 ```
 
+## Configuration
+
+The paths are configured in the site configuration
+
+```
+templatedMail:
+  templateRootPath: EXT:templatedmail/Resources/Private/Templates/
+  partialRootPath: EXT:templatedmail/Resources/Private/Partials/
+  layoutRootPath: EXT:templatedmail/Resources/Private/Layouts/
+```
+
+If a mail is sent via CLI, the used site can be set with `$templatedMail->setSite($site);`
+
 ## Requirements
 
 - TYPO3 8.7 / 9.5 LTS
