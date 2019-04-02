@@ -36,7 +36,7 @@ class TemplateCommand extends Command
     }
 
     /**
-     * Executes the command for importing a t3d/xml file into the TYPO3 system
+     * Executes the command for sending an email
      *
      * @param InputInterface $input
      * @param OutputInterface $output
