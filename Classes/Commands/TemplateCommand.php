@@ -43,12 +43,12 @@ class TemplateCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $templatedMail = GeneralUtility::makeInstance(TemplatedEmail::class);
+        $templatedEmail = GeneralUtility::makeInstance(TemplatedEmail::class);
         $site = $this->getSiteByName('master');
         if ($site) {
-            $templatedMail->setSite($site);
+            $templatedEmail->setSite($site);
         }
-        $templatedMail->addTo('dummy@example.org')
+        $templatedEmail->addTo('dummy@example.org')
             ->addFrom('noreply@fo.com', 'Test')
             ->setSubject('A mail')
             ->addContentAsRaw('Hello' . LF . 'an example', TemplatedEmail::FORMAT_PLAIN)

@@ -36,8 +36,8 @@ This example will send one mail with the following parts:
 ### Using A template file
 
 ```
-$templatedMail = GeneralUtility::makeInstance(TemplatedEmail::class);
-$templatedMail->addTo('reciepient@example.org')
+$templatedEmail = GeneralUtility::makeInstance(TemplatedEmail::class);
+$templatedEmail->addTo('reciepient@example.org')
     ->addFrom('noreply@fo.com', 'Test')
     ->setSubject('A mail')
     ->addContentAsFluidTemplateFile('EXT:templatedmail/Resources/Private/Templates/Examples/Example.html', ['title' => 'My title'], TemplatedEmail::FORMAT_HTML)
@@ -47,8 +47,8 @@ $templatedMail->addTo('reciepient@example.org')
 ### Using A template
 
 ```
-$templatedMail = GeneralUtility::makeInstance(TemplatedEmail::class);
-$templatedMail->addTo('dummy@example.org')
+$templatedEmail = GeneralUtility::makeInstance(TemplatedEmail::class);
+$templatedEmail->addTo('dummy@example.org')
     ->addFrom('noreply@fo.com', 'Test')
     ->setSubject('A mail')
     ->setTemplateRootPaths(['EXT:dummy/Resources/Private/Templates/'])
@@ -68,7 +68,7 @@ templatedMail:
   layoutRootPath: EXT:templatedmail/Resources/Private/Layouts/
 ```
 
-If a mail is sent via CLI, the used site can be set with `$templatedMail->setSite($site);`
+If a mail is sent via CLI, the used site can be set with `$templatedEmail->setSite($site);`
 
 ## Requirements
 

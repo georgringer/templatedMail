@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace GeorgRinger\Templatedmail\Mail;
+namespace GeorgRinger\templatedEmail\Mail;
 
 
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
@@ -113,16 +113,16 @@ class TemplatedEmail extends MailMessage
         $site = $this->site ?: $this->getCurrentSite();
         if ($site) {
             $configuration = $site->getConfiguration();
-            if (isset($configuration['templatedMail'])) {
-                $templatePath = $configuration['templatedMail']['templateRootPath'] ?? '';
+            if (isset($configuration['templatedEmail'])) {
+                $templatePath = $configuration['templatedEmail']['templateRootPath'] ?? '';
                 if ($templatePath) {
                     $this->templateRootPaths = [$templatePath];
                 }
-                $partialPath = $configuration['templatedMail']['partialRootPath'] ?? '';
+                $partialPath = $configuration['templatedEmail']['partialRootPath'] ?? '';
                 if ($partialPath) {
                     $this->partialRootPaths = [$partialPath];
                 }
-                $layoutPath = $configuration['templatedMail']['layoutRootPath'] ?? '';
+                $layoutPath = $configuration['templatedEmail']['layoutRootPath'] ?? '';
                 if ($layoutPath) {
                     $this->layoutRootPaths = [$layoutPath];
                 }
