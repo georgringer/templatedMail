@@ -18,7 +18,7 @@ $EM_CONF[$_EXTKEY] = [
     ],
     'autoload' => [
         'psr-4' => [
-            'GeorgRinger\\Templatedmail\\' => 'Classes'
+            'GeorgRinger\\TemplatedMail\\' => 'Classes'
         ]
     ],
 ];

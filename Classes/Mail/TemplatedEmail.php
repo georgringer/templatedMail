@@ -1,13 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace GeorgRinger\templatedEmail\Mail;
+namespace GeorgRinger\TemplatedMail\Mail;
 
-
+use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Mail\MailMessage;
 use TYPO3\CMS\Core\Routing\SiteMatcher;
-use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\Entity\SiteInterface;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -106,7 +105,6 @@ class TemplatedEmail extends MailMessage
             throw new \UnexpectedValueException(sprintf('Given format "%s" is unknown', $format), 1552682965);
         }
     }
-
 
     protected function init(string $format): void
     {

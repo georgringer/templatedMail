@@ -7,5 +7,4 @@
 Hello {title}
 </f:section>
 
-
 </html>

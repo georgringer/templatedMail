@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace GeorgRinger\Templatedmail\Commands;
+namespace GeorgRinger\TemplatedMail\Commands;
 
 /*
  * This file is part of the TYPO3 CMS project.

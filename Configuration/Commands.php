@@ -7,6 +7,6 @@
  */
 return [
     'mail:template' => [
-        'class' => \GeorgRinger\Templatedmail\Commands\TemplateCommand::class
+        'class' => \GeorgRinger\TemplatedMail\Commands\TemplateCommand::class
     ]
 ];
