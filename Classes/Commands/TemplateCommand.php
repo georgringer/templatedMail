@@ -50,6 +50,7 @@ class TemplateCommand extends Command
         }
         $templatedEmail->addTo('dummy@example.org')
             ->addFrom('noreply@fo.com', 'Test')
+            ->setLanguage('fr')
             ->setSubject('A mail')
             ->addContentAsRaw('Hello' . LF . 'an example', TemplatedEmail::FORMAT_PLAIN)
             ->addContentAsRaw('<h1>Hello</h1> an example', TemplatedEmail::FORMAT_HTML)

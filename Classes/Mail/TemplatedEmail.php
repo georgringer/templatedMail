@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace GeorgRinger\templatedEmail\Mail;
+namespace GeorgRinger\Templatedmail\Mail;
 
 
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Mail\MailMessage;
 use TYPO3\CMS\Core\Routing\SiteMatcher;
-use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\Entity\SiteInterface;
+use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
@@ -33,6 +33,9 @@ class TemplatedEmail extends MailMessage
 
     /** @var SiteInterface */
     protected $site;
+
+    /** @var string */
+    protected $language = '';
 
     /**
      * @param array $layoutRootPaths
@@ -66,6 +69,16 @@ class TemplatedEmail extends MailMessage
         $this->site = $site;
     }
 
+    /**
+     * @param string $language
+     * @return TemplatedEmail
+     */
+    public function setLanguage(string $language): TemplatedEmail
+    {
+        $this->language = $language;
+        return $this;
+    }
+
     public function addContentAsFluidTemplate(string $templateName, array $variables = [], string $format = self::FORMAT_HTML): TemplatedEmail
     {
         $this->init($format);
@@ -89,11 +102,22 @@ class TemplatedEmail extends MailMessage
     public function addContentAsRaw(string $content, string $format = self::FORMAT_HTML, string $templateName = 'Raw'): TemplatedEmail
     {
         $this->init($format);
-        $this->view->setTemplate($templateName . '.' . $format);
+        $this->view->setTemplate($this->resolveLanguageSuffix($templateName, $format));
         $this->view->assign('content', $content);
 
         $this->addContent($format, $this->view->render());
         return $this;
+    }
+
+    protected function resolveLanguageSuffix(string $template, string $format): string
+    {
+        if ($this->language) { // todo add language
+            $path = $template . '.' . $format;
+        } else {
+            $path = $template . '.' . $format;
+        }
+ 
+        return $path;
     }
 
     protected function addContent(string $format, string $content): void
@@ -114,17 +138,17 @@ class TemplatedEmail extends MailMessage
         if ($site) {
             $configuration = $site->getConfiguration();
             if (isset($configuration['templatedEmail'])) {
-                $templatePath = $configuration['templatedEmail']['templateRootPath'] ?? '';
-                if ($templatePath) {
-                    $this->templateRootPaths = [$templatePath];
+                $templatePaths = $configuration['templatedEmail']['templateRootPaths'] ?? [];
+                if ($templatePaths) {
+                    $this->templateRootPaths = $templatePaths;
                 }
-                $partialPath = $configuration['templatedEmail']['partialRootPath'] ?? '';
-                if ($partialPath) {
-                    $this->partialRootPaths = [$partialPath];
+                $partialPaths = $configuration['templatedEmail']['partialRootPaths'] ?? [];
+                if ($partialPaths) {
+                    $this->partialRootPaths = $partialPaths;
                 }
-                $layoutPath = $configuration['templatedEmail']['layoutRootPath'] ?? '';
-                if ($layoutPath) {
-                    $this->layoutRootPaths = [$layoutPath];
+                $layoutPaths = $configuration['templatedEmail']['layoutRootPaths'] ?? [];
+                if ($layoutPaths) {
+                    $this->layoutRootPaths = $layoutPaths;
                 }
             }
         } else {
@@ -134,6 +158,12 @@ class TemplatedEmail extends MailMessage
             $this->partialRootPaths = [$path . 'Partials/'];
         }
 
+        if (!$this->language) {
+            $siteLanguage = $this->getCurrentSiteLanguage();
+            if ($siteLanguage) {
+                $this->language = $siteLanguage->getTwoLetterIsoCode();
+            }
+        }
         $this->view = GeneralUtility::makeInstance(StandaloneView::class);
         $this->view->setLayoutRootPaths($this->layoutRootPaths);
         $this->view->setTemplateRootPaths($this->templateRootPaths);
@@ -144,6 +174,9 @@ class TemplatedEmail extends MailMessage
 
         $css = file_get_contents(ExtensionManagementUtility::extPath('templatedmail') . 'Resources/Public/Css/simple.css');
         $this->view->assign('css', $css);
+        $this->view->assign('site', $site);
+        $this->view->assign('siteLanguage', $siteLanguage);
+        $this->view->assign('language', $this->language);
     }
 
     protected function getCurrentSite(): ?SiteInterface
@@ -161,6 +194,19 @@ class TemplatedEmail extends MailMessage
             return $site;
         }
         return null;
+    }
+
+    /**
+     * Returns the currently configured "site language" if a site is configured (= resolved) in the current request.
+     */
+    protected function getCurrentSiteLanguage(): ?SiteLanguage
+    {
+        $request = $GLOBALS['TYPO3_REQUEST'] ?? null;
+        return $request
+        && $request instanceof ServerRequestInterface
+        && $request->getAttribute('language') instanceof SiteLanguage
+            ? $request->getAttribute('language')
+            : null;
     }
 
     protected function getDefaultVariables(): array
