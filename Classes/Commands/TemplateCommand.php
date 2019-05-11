@@ -52,8 +52,8 @@ class TemplateCommand extends Command
             ->addFrom('noreply@fo.com', 'Test')
             ->setLanguage('fr')
             ->setSubject('A mail')
-            ->addContentAsRaw('Hello' . LF . 'an example', TemplatedEmail::FORMAT_PLAIN)
             ->addContentAsRaw('<h1>Hello</h1> an example', TemplatedEmail::FORMAT_HTML)
+            ->addContentAsRaw('Hello' . LF . 'an example', TemplatedEmail::FORMAT_PLAIN)
             ->send();
 
         $io = new SymfonyStyle($input, $output);

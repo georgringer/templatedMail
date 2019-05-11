@@ -40,33 +40,37 @@ class TemplatedEmail extends MailMessage
     /**
      * @param array $layoutRootPaths
      */
-    public function setLayoutRootPaths(array $layoutRootPaths): void
+    public function setLayoutRootPaths(array $layoutRootPaths): TemplatedEmail
     {
         $this->layoutRootPaths = $layoutRootPaths;
+        return $this;
     }
 
     /**
      * @param array $partialRootPaths
      */
-    public function setPartialRootPaths(array $partialRootPaths): void
+    public function setPartialRootPaths(array $partialRootPaths): TemplatedEmail
     {
         $this->partialRootPaths = $partialRootPaths;
+        return $this;
     }
 
     /**
      * @param array $templateRootPaths
      */
-    public function setTemplateRootPaths(array $templateRootPaths): void
+    public function setTemplateRootPaths(array $templateRootPaths): TemplatedEmail
     {
         $this->templateRootPaths = $templateRootPaths;
+        return $this;
     }
 
     /**
      * @param SiteInterface $site
      */
-    public function setSite(SiteInterface $site): void
+    public function setSite(SiteInterface $site): TemplatedEmail
     {
         $this->site = $site;
+        return $this;
     }
 
     /**
@@ -116,7 +120,7 @@ class TemplatedEmail extends MailMessage
         } else {
             $path = $template . '.' . $format;
         }
- 
+
         return $path;
     }
 
