@@ -7,6 +7,11 @@ This extension is a proof of concept how to improve the templating of mails.
 - All mails share the same layout which makes it easier to style mails
 - It is faster to create nice mails
 
+## Requirements
+
+- TYPO3 8, 9 or 10
+- PHP 7.2
+
 
 ## Usage
 
@@ -71,8 +76,3 @@ templatedMail:
 ```
 
 If a mail is sent via CLI, the used site can be set with `$templatedEmail->setSite($site);`
-
-## Requirements
-
-- TYPO3 8.7 / 9.5 LTS
-- GPL License
