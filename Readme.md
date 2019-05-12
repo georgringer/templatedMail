@@ -28,13 +28,10 @@ The example can also be called by CLI with `./web/bin/typo3 mail:template`.
 
 This example will send one mail with the following parts:
 
-**HTML part**
+|                       HTML part                        |                    Plain text part                     |
+|:------------------------------------------------------:|:------------------------------------------------------:|
+| ![HTML](Resources/Public/Screenshots/example-html.png) | ![Plain](Resources/Public/Screenshots/example-txt.png) |
 
-![HTML](Resources/Public/Screenshots/example-html.png)
-
-**Plain text part**
-
-![Plain](Resources/Public/Screenshots/example-txt.png)
 
 ## Further examples
 
