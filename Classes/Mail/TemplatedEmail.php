@@ -42,6 +42,7 @@ class TemplatedEmail extends MailMessage
         parent::__construct($subject, $body, $contentType, $charset);
 
         $this->view = GeneralUtility::makeInstance(StandaloneView::class);
+
         $path = GeneralUtility::getFileAbsFileName('EXT:templatedmail/Resources/Private/');
         $this->templateRootPaths = [$path . 'Templates/'];
         $this->layoutRootPaths = [$path . 'Layouts/'];
@@ -182,17 +183,11 @@ class TemplatedEmail extends MailMessage
             if ($site) {
                 $configuration = $site->getConfiguration();
                 if (isset($configuration['templatedEmail'])) {
-                    $templatePaths = $configuration['templatedEmail']['templateRootPaths'] ?? [];
-                    if ($templatePaths) {
-                        $this->templateRootPaths = $templatePaths;
-                    }
-                    $partialPaths = $configuration['templatedEmail']['partialRootPaths'] ?? [];
-                    if ($partialPaths) {
-                        $this->partialRootPaths = $partialPaths;
-                    }
-                    $layoutPaths = $configuration['templatedEmail']['layoutRootPaths'] ?? [];
-                    if ($layoutPaths) {
-                        $this->layoutRootPaths = $layoutPaths;
+                    foreach(['templateRootPaths', 'partialRootPaths', 'layoutRootPaths'] as $name) {
+                        $paths = $configuration['templatedEmail'][$name] ?? [];
+                        if ($paths) {
+                            $this->$name = $paths;
+                        }
                     }
                 }
             }
@@ -215,12 +210,15 @@ class TemplatedEmail extends MailMessage
         $this->view->assign('language', $this->language);
     }
 
+    /**
+     * @return SiteInterface|null
+     */
     protected function getCurrentSite(): ?SiteInterface
     {
         if ($GLOBALS['TYPO3_REQUEST'] instanceof ServerRequestInterface) {
             return $GLOBALS['TYPO3_REQUEST']->getAttribute('site', null);
         }
-        if (MathUtility::canBeInterpretedAsInteger($GLOBALS['TSFE']->id) && $GLOBALS['TSFE']->id > 0) {
+        if (is_object($GLOBALS['TSFE']) && MathUtility::canBeInterpretedAsInteger($GLOBALS['TSFE']->id) && $GLOBALS['TSFE']->id > 0) {
             $matcher = GeneralUtility::makeInstance(SiteMatcher::class);
             try {
                 $site = $matcher->matchByPageId((int)$GLOBALS['TSFE']->id);
@@ -234,6 +232,8 @@ class TemplatedEmail extends MailMessage
 
     /**
      * Returns the currently configured "site language" if a site is configured (= resolved) in the current request.
+     *
+     * @return SiteLanguage|null
      */
     protected function getCurrentSiteLanguage(): ?SiteLanguage
     {
@@ -245,6 +245,9 @@ class TemplatedEmail extends MailMessage
             : null;
     }
 
+    /**
+     * @return array
+     */
     protected function getDefaultVariables(): array
     {
         return [
