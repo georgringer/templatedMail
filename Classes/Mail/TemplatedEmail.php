@@ -3,14 +3,12 @@ declare(strict_types=1);
 
 namespace GeorgRinger\Templatedmail\Mail;
 
-
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Mail\MailMessage;
 use TYPO3\CMS\Core\Routing\SiteMatcher;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\Entity\SiteInterface;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\IpAnonymizationUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
@@ -53,7 +51,7 @@ class TemplatedEmail extends MailMessage
     /**
      * @param array $layoutRootPaths
      */
-    public function setLayoutRootPaths(array $layoutRootPaths): TemplatedEmail
+    public function setLayoutRootPaths(array $layoutRootPaths): self
     {
         $this->layoutRootPaths = $layoutRootPaths;
         return $this;
@@ -62,7 +60,7 @@ class TemplatedEmail extends MailMessage
     /**
      * @param array $partialRootPaths
      */
-    public function setPartialRootPaths(array $partialRootPaths): TemplatedEmail
+    public function setPartialRootPaths(array $partialRootPaths): self
     {
         $this->partialRootPaths = $partialRootPaths;
         return $this;
@@ -71,7 +69,7 @@ class TemplatedEmail extends MailMessage
     /**
      * @param array $templateRootPaths
      */
-    public function setTemplateRootPaths(array $templateRootPaths): TemplatedEmail
+    public function setTemplateRootPaths(array $templateRootPaths): self
     {
         $this->templateRootPaths = $templateRootPaths;
         return $this;
@@ -80,7 +78,7 @@ class TemplatedEmail extends MailMessage
     /**
      * @param SiteInterface $site
      */
-    public function setSite(SiteInterface $site): TemplatedEmail
+    public function setSite(SiteInterface $site): self
     {
         $this->site = $site;
         return $this;
@@ -90,13 +88,13 @@ class TemplatedEmail extends MailMessage
      * @param string $language
      * @return TemplatedEmail
      */
-    public function setLanguage(string $language): TemplatedEmail
+    public function setLanguage(string $language): self
     {
         $this->language = $language;
         return $this;
     }
 
-    public function htmlTemplateName(string $templateName): TemplatedEmail
+    public function htmlTemplateName(string $templateName): self
     {
         $format = self::FORMAT_HTML;
         $this->init($format);
@@ -106,7 +104,7 @@ class TemplatedEmail extends MailMessage
         return $this;
     }
 
-    public function textTemplateName(string $templateName): TemplatedEmail
+    public function textTemplateName(string $templateName): self
     {
         $format = self::FORMAT_PLAIN;
         $this->init($format);
@@ -116,13 +114,13 @@ class TemplatedEmail extends MailMessage
         return $this;
     }
 
-    public function context(array $variables): TemplatedEmail
+    public function context(array $variables): self
     {
         $this->view->assignMultiple($variables);
         return $this;
     }
 
-    public function htmlTemplateFile(string $templateFile): TemplatedEmail
+    public function htmlTemplateFile(string $templateFile): self
     {
         $this->init($format);
         $this->view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName($templateFile));
@@ -131,7 +129,7 @@ class TemplatedEmail extends MailMessage
         return $this;
     }
 
-    public function textTemplateFile(string $templateFile): TemplatedEmail
+    public function textTemplateFile(string $templateFile): self
     {
         $this->init($format);
         $this->view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName($templateFile));
@@ -140,19 +138,19 @@ class TemplatedEmail extends MailMessage
         return $this;
     }
 
-    public function htmlContent(string $content, string $templateName = 'Default'): TemplatedEmail
+    public function htmlContent(string $content, string $templateName = 'Default'): self
     {
         $this->addContent($content, self::FORMAT_HTML, $templateName);
         return $this;
     }
 
-    public function textContent(string $content, string $templateName = 'Default'): TemplatedEmail
+    public function textContent(string $content, string $templateName = 'Default'): self
     {
         $this->addContent($content, self::FORMAT_PLAIN, $templateName);
         return $this;
     }
 
-    private function addContent(string $content, string $format, string $templateName): TemplatedEmail
+    private function addContent(string $content, string $format, string $templateName): self
     {
         $this->init($format);
         $this->view->setTemplate($this->resolveLanguageSuffix($templateName, $format));
