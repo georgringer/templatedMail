@@ -212,7 +212,7 @@ class TemplatedEmail extends MailMessage
         $this->view->setTemplateRootPaths($this->templateRootPaths);
         $this->view->setPartialRootPaths($this->partialRootPaths);
         $this->view->setFormat($format);
-        $this->view->assignMultiple($this->getDefaultVariables());
+        $this->view->assign('defaults', $this->getDefaultVariables());
 
         $this->view->assign('language', $this->language);
     }
@@ -250,10 +250,8 @@ class TemplatedEmail extends MailMessage
     protected function getDefaultVariables(): array
     {
         return [
-            'default' => [
-                'sitename' => $GLOBALS['TYPO3_CONF_VARS']['SYS']['sitename'],
-                'clientIp' => IpAnonymizationUtility::anonymizeIp(GeneralUtility::getIndpEnv(GeneralUtility::getIndpEnv('REMOTE_ADDR')))
-            ]
+            'sitename' => $GLOBALS['TYPO3_CONF_VARS']['SYS']['sitename'],
+            'clientIp' => IpAnonymizationUtility::anonymizeIp(GeneralUtility::getIndpEnv(GeneralUtility::getIndpEnv('REMOTE_ADDR')))
         ];
     }
 }
