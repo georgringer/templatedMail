@@ -9,7 +9,6 @@ namespace GeorgRinger\Templatedmail\Tests\Unit\Mail;
  * For the full copyright and license information, please read the
  * LICENSE.txt file that was distributed with this source code.
  */
-
 use GeorgRinger\Templatedmail\Mail\TemplatedEmail;
 use TYPO3\TestingFramework\Core\BaseTestCase;
 
@@ -28,5 +27,4 @@ class TemplatedEmailTest extends BaseTestCase
         ];
         $this->assertEquals($defaults, $subject->_call('getDefaultVariables'));
     }
-
 }

@@ -95,7 +95,6 @@ class TemplateCommand extends Command
         try {
             $site = GeneralUtility::makeInstance(SiteFinder::class)->getSiteByIdentifier($identifier);
         } catch (SiteNotFoundException $e) {
-
         }
         return $site;
     }
