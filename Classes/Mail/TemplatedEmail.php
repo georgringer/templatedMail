@@ -7,17 +7,19 @@ namespace GeorgRinger\Templatedmail\Mail;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Mail\MailMessage;
 use TYPO3\CMS\Core\Routing\SiteMatcher;
+use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\Entity\SiteInterface;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\IpAnonymizationUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
 class TemplatedEmail extends MailMessage
 {
-    public const FORMAT_HTML = 'html';
-    public const FORMAT_PLAIN = 'txt';
+    private const FORMAT_HTML = 'html';
+    private const FORMAT_PLAIN = 'txt';
 
     /** @var array */
     protected $layoutRootPaths = [];
@@ -36,6 +38,17 @@ class TemplatedEmail extends MailMessage
 
     /** @var string */
     protected $language = '';
+
+    public function __construct($subject = null, $body = null, $contentType = null, $charset = null)
+    {
+        parent::__construct($subject, $body, $contentType, $charset);
+
+        $this->view = GeneralUtility::makeInstance(StandaloneView::class);
+        $path = GeneralUtility::getFileAbsFileName('EXT:templatedmail/Resources/Private/');
+        $this->templateRootPaths = [$path . 'Templates/'];
+        $this->layoutRootPaths = [$path . 'Layouts/'];
+        $this->partialRootPaths = [$path . 'Partials/'];
+    }
 
     /**
      * @param array $layoutRootPaths
@@ -83,27 +96,56 @@ class TemplatedEmail extends MailMessage
         return $this;
     }
 
-    public function addContentAsFluidTemplate(string $templateName, array $variables = [], string $format = self::FORMAT_HTML): TemplatedEmail
+    public function addContentAsFluidTemplateHtml(string $templateName): TemplatedEmail
     {
-        $this->init($format);
-        $this->view->setTemplate($templateName . '.' . $format);
-        $this->view->assignMultiple($variables);
-
-        $this->addContent($format, $this->view->render());
+        $this->addContentAsFluidTemplate($templateName, self::FORMAT_HTML);
         return $this;
     }
 
-    public function addContentAsFluidTemplateFile(string $templateFile, array $variables = [], string $format = self::FORMAT_HTML): TemplatedEmail
+    public function addContentAsFluidTemplatePlain(string $templateName): TemplatedEmail
+    {
+        $this->addContentAsFluidTemplate($templateName, self::FORMAT_PLAIN);
+        return $this;
+    }
+
+
+    public function addVariables(array $variables): TemplatedEmail
+    {
+        $this->view->assignMultiple($variables);
+        return $this;
+    }
+
+    public function addContentAsFluidTemplateFileHtml(string $templateFile): TemplatedEmail
     {
         $this->init($format);
         $this->view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName($templateFile));
-        $this->view->assignMultiple($variables);
 
-        $this->addContent($format, $this->view->render());
+        $this->addContent(self::FORMAT_HTML, $this->view->render());
         return $this;
     }
 
-    public function addContentAsRaw(string $content, string $format = self::FORMAT_HTML, string $templateName = 'Raw'): TemplatedEmail
+    public function addContentAsFluidTemplateFilePlain(string $templateFile): TemplatedEmail
+    {
+        $this->init($format);
+        $this->view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName($templateFile));
+
+        $this->addContent(self::FORMAT_PLAIN, $this->view->render());
+        return $this;
+    }
+
+    public function addContentAsRawHtml(string $content, string $templateName = 'Default'): TemplatedEmail
+    {
+        $this->addContentAsRaw($content, self::FORMAT_HTML, $templateName);
+        return $this;
+    }
+
+    public function addContentAsRawPlain(string $content, string $templateName = 'Default'): TemplatedEmail
+    {
+        $this->addContentAsRaw($content, self::FORMAT_PLAIN, $templateName);
+        return $this;
+    }
+
+    private function addContentAsRaw(string $content, string $format, string $templateName): TemplatedEmail
     {
         $this->init($format);
         $this->view->setTemplate($this->resolveLanguageSuffix($templateName, $format));
@@ -135,51 +177,54 @@ class TemplatedEmail extends MailMessage
         }
     }
 
+    private function addContentAsFluidTemplate(string $templateName, string $format): TemplatedEmail
+    {
+        $this->init($format);
+        $this->view->setTemplate($templateName . '.' . $format);
+
+        $this->addContent($format, $this->view->render());
+        return $this;
+    }
 
     protected function init(string $format): void
     {
-        $site = $this->site ?: $this->getCurrentSite();
-        if ($site) {
-            $configuration = $site->getConfiguration();
-            if (isset($configuration['templatedEmail'])) {
-                $templatePaths = $configuration['templatedEmail']['templateRootPaths'] ?? [];
-                if ($templatePaths) {
-                    $this->templateRootPaths = $templatePaths;
-                }
-                $partialPaths = $configuration['templatedEmail']['partialRootPaths'] ?? [];
-                if ($partialPaths) {
-                    $this->partialRootPaths = $partialPaths;
-                }
-                $layoutPaths = $configuration['templatedEmail']['layoutRootPaths'] ?? [];
-                if ($layoutPaths) {
-                    $this->layoutRootPaths = $layoutPaths;
+        if (class_exists(Site::class)) {
+            $site = $this->site ?: $this->getCurrentSite();
+            if ($site) {
+                $configuration = $site->getConfiguration();
+                if (isset($configuration['templatedEmail'])) {
+                    $templatePaths = $configuration['templatedEmail']['templateRootPaths'] ?? [];
+                    if ($templatePaths) {
+                        $this->templateRootPaths = $templatePaths;
+                    }
+                    $partialPaths = $configuration['templatedEmail']['partialRootPaths'] ?? [];
+                    if ($partialPaths) {
+                        $this->partialRootPaths = $partialPaths;
+                    }
+                    $layoutPaths = $configuration['templatedEmail']['layoutRootPaths'] ?? [];
+                    if ($layoutPaths) {
+                        $this->layoutRootPaths = $layoutPaths;
+                    }
                 }
             }
-        } else {
-            $path = GeneralUtility::getFileAbsFileName('EXT:templatedmail/Resources/Private/');
-            $this->templateRootPaths = [$path . 'Templates/'];
-            $this->layoutRootPaths = [$path . 'Layouts/'];
-            $this->partialRootPaths = [$path . 'Partials/'];
+            if (!$this->language) {
+                $siteLanguage = $this->getCurrentSiteLanguage();
+                if ($siteLanguage) {
+                    $this->language = $siteLanguage->getTwoLetterIsoCode();
+                }
+            }
+            $this->view->assign('site', $site);
+            $this->view->assign('siteLanguage', $siteLanguage);
         }
 
-        if (!$this->language) {
-            $siteLanguage = $this->getCurrentSiteLanguage();
-            if ($siteLanguage) {
-                $this->language = $siteLanguage->getTwoLetterIsoCode();
-            }
-        }
-        $this->view = GeneralUtility::makeInstance(StandaloneView::class);
         $this->view->setLayoutRootPaths($this->layoutRootPaths);
         $this->view->setTemplateRootPaths($this->templateRootPaths);
         $this->view->setPartialRootPaths($this->partialRootPaths);
         $this->view->setFormat($format);
-
         $this->view->assignMultiple($this->getDefaultVariables());
 
         $css = file_get_contents(ExtensionManagementUtility::extPath('templatedmail') . 'Resources/Public/Css/simple.css');
         $this->view->assign('css', $css);
-        $this->view->assign('site', $site);
-        $this->view->assign('siteLanguage', $siteLanguage);
         $this->view->assign('language', $this->language);
     }
 
@@ -218,6 +263,7 @@ class TemplatedEmail extends MailMessage
         return [
             'default' => [
                 'sitename' => $GLOBALS['TYPO3_CONF_VARS']['SYS']['sitename'],
+                'clientIp' => IpAnonymizationUtility::anonymizeIp(GeneralUtility::getIndpEnv(GeneralUtility::getIndpEnv('REMOTE_ADDR')))
             ]
         ];
     }

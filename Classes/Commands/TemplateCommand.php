@@ -52,12 +52,41 @@ class TemplateCommand extends Command
             ->addFrom('noreply@fo.com', 'Test')
             ->setLanguage('fr')
             ->setSubject('A mail')
-            ->addContentAsRaw('<h1>Hello</h1> an example', TemplatedEmail::FORMAT_HTML)
-            ->addContentAsRaw('Hello' . LF . 'an example', TemplatedEmail::FORMAT_PLAIN)
+            ->addContentAsRawHtml('<h1>Hello</h1> an example')
+            ->addContentAsRawPlain('Hello' . LF . 'an example')
             ->send();
 
         $io = new SymfonyStyle($input, $output);
         $io->success('Done');
+    }
+
+    private function examples()
+    {
+        $templatedMail = GeneralUtility::makeInstance(TemplatedEmail::class);
+        $templatedMail->addTo('dummy@example.org')
+            ->addFrom('noreply@fo.com', 'Test')
+            ->setSubject('A mail')
+            ->addContentAsRawHtml('Hello' . LF . 'an example')
+            ->addContentAsRawPlain('<h1>Hello</h1> an example')
+            ->send();
+
+        $templatedEmail = GeneralUtility::makeInstance(TemplatedEmail::class);
+        $templatedEmail->addTo('reciepient@example.org')
+            ->addFrom('noreply@fo.com', 'Test')
+            ->setSubject('A mail')
+            ->addVariables(['title' => 'My title'])
+            ->addContentAsFluidTemplateFileHtml('EXT:templatedmail/Resources/Private/Templates/Examples/Example.html')
+            ->send();
+
+        $templatedEmail = GeneralUtility::makeInstance(TemplatedEmail::class);
+        $templatedEmail->addTo('dummy@example.org')
+            ->addFrom('noreply@fo.com', 'Test')
+            ->setSubject('A mail')
+            ->setTemplateRootPaths(['EXT:dummy/Resources/Private/Templates/'])
+            ->addVariables(['title' => 'My title'])
+            ->addContentAsFluidTemplateHtml('Examples/Simple')
+            ->addContentAsFluidTemplatePlain('Examples/Simple')
+            ->send();
     }
 
     protected function getSiteByName(string $identifier)
