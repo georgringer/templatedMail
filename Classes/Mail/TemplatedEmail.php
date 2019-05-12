@@ -183,7 +183,7 @@ class TemplatedEmail extends MailMessage
             if ($site) {
                 $configuration = $site->getConfiguration();
                 if (isset($configuration['templatedEmail'])) {
-                    foreach(['templateRootPaths', 'partialRootPaths', 'layoutRootPaths'] as $name) {
+                    foreach (['templateRootPaths', 'partialRootPaths', 'layoutRootPaths'] as $name) {
                         $paths = $configuration['templatedEmail'][$name] ?? [];
                         if ($paths) {
                             $this->$name = $paths;
