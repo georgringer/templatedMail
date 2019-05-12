@@ -96,62 +96,73 @@ class TemplatedEmail extends MailMessage
         return $this;
     }
 
-    public function addContentAsFluidTemplateHtml(string $templateName): TemplatedEmail
+    public function htmlTemplateName(string $templateName): TemplatedEmail
     {
-        $this->addContentAsFluidTemplate($templateName, self::FORMAT_HTML);
+        $format = self::FORMAT_HTML;
+        $this->init($format);
+        $this->view->setTemplate($templateName . '.' . $format);
+
+        $this->setBody($this->view->render(), 'text/html');
         return $this;
     }
 
-    public function addContentAsFluidTemplatePlain(string $templateName): TemplatedEmail
+    public function textTemplateName(string $templateName): TemplatedEmail
     {
-        $this->addContentAsFluidTemplate($templateName, self::FORMAT_PLAIN);
+        $format = self::FORMAT_PLAIN;
+        $this->init($format);
+        $this->view->setTemplate($templateName . '.' . $format);
+
+        $this->addPart($this->view->render(), 'text/plain');
         return $this;
     }
 
-
-    public function addVariables(array $variables): TemplatedEmail
+    public function context(array $variables): TemplatedEmail
     {
         $this->view->assignMultiple($variables);
         return $this;
     }
 
-    public function addContentAsFluidTemplateFileHtml(string $templateFile): TemplatedEmail
+    public function htmlTemplateFile(string $templateFile): TemplatedEmail
     {
         $this->init($format);
         $this->view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName($templateFile));
 
-        $this->addContent(self::FORMAT_HTML, $this->view->render());
+        $this->setBody($this->view->render(), 'text/html');
         return $this;
     }
 
-    public function addContentAsFluidTemplateFilePlain(string $templateFile): TemplatedEmail
+    public function textTemplateFile(string $templateFile): TemplatedEmail
     {
         $this->init($format);
         $this->view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName($templateFile));
 
-        $this->addContent(self::FORMAT_PLAIN, $this->view->render());
+        $this->addPart($this->view->render(), 'text/plain');
         return $this;
     }
 
-    public function addContentAsRawHtml(string $content, string $templateName = 'Default'): TemplatedEmail
+    public function htmlContent(string $content, string $templateName = 'Default'): TemplatedEmail
     {
-        $this->addContentAsRaw($content, self::FORMAT_HTML, $templateName);
+        $this->addContent($content, self::FORMAT_HTML, $templateName);
         return $this;
     }
 
-    public function addContentAsRawPlain(string $content, string $templateName = 'Default'): TemplatedEmail
+    public function textContent(string $content, string $templateName = 'Default'): TemplatedEmail
     {
-        $this->addContentAsRaw($content, self::FORMAT_PLAIN, $templateName);
+        $this->addContent($content, self::FORMAT_PLAIN, $templateName);
         return $this;
     }
 
-    private function addContentAsRaw(string $content, string $format, string $templateName): TemplatedEmail
+    private function addContent(string $content, string $format, string $templateName): TemplatedEmail
     {
         $this->init($format);
         $this->view->setTemplate($this->resolveLanguageSuffix($templateName, $format));
         $this->view->assign('content', $content);
 
-        $this->addContent($format, $this->view->render());
+        if ($format === self::FORMAT_HTML) {
+            $this->setBody($this->view->render(), 'text/html');
+        } elseif ($format === self::FORMAT_PLAIN) {
+            $this->addPart($this->view->render(), 'text/plain');
+        }
         return $this;
     }
 
@@ -164,26 +175,6 @@ class TemplatedEmail extends MailMessage
         }
 
         return $path;
-    }
-
-    protected function addContent(string $format, string $content): void
-    {
-        if ($format === self::FORMAT_HTML) {
-            $this->setBody($content, 'text/html');
-        } elseif ($format === self::FORMAT_PLAIN) {
-            $this->addPart($content, 'text/plain');
-        } else {
-            throw new \UnexpectedValueException(sprintf('Given format "%s" is unknown', $format), 1552682965);
-        }
-    }
-
-    private function addContentAsFluidTemplate(string $templateName, string $format): TemplatedEmail
-    {
-        $this->init($format);
-        $this->view->setTemplate($templateName . '.' . $format);
-
-        $this->addContent($format, $this->view->render());
-        return $this;
     }
 
     protected function init(string $format): void
@@ -223,8 +214,6 @@ class TemplatedEmail extends MailMessage
         $this->view->setFormat($format);
         $this->view->assignMultiple($this->getDefaultVariables());
 
-        $css = file_get_contents(ExtensionManagementUtility::extPath('templatedmail') . 'Resources/Public/Css/simple.css');
-        $this->view->assign('css', $css);
         $this->view->assign('language', $this->language);
     }
 

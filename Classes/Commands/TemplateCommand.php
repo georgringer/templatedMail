@@ -52,8 +52,8 @@ class TemplateCommand extends Command
             ->addFrom('noreply@fo.com', 'Test')
             ->setLanguage('fr')
             ->setSubject('A mail')
-            ->addContentAsRawHtml('<h1>Hello</h1> an example')
-            ->addContentAsRawPlain('Hello' . LF . 'an example')
+            ->htmlContent('<h1>Hello</h1> an example')
+            ->textContent('Hello' . LF . 'an example')
             ->send();
 
         $io = new SymfonyStyle($input, $output);
@@ -66,16 +66,16 @@ class TemplateCommand extends Command
         $templatedMail->addTo('dummy@example.org')
             ->addFrom('noreply@fo.com', 'Test')
             ->setSubject('A mail')
-            ->addContentAsRawHtml('Hello' . LF . 'an example')
-            ->addContentAsRawPlain('<h1>Hello</h1> an example')
+            ->htmlContent('Hello' . LF . 'an example')
+            ->textContent('<h1>Hello</h1> an example')
             ->send();
 
         $templatedEmail = GeneralUtility::makeInstance(TemplatedEmail::class);
         $templatedEmail->addTo('reciepient@example.org')
             ->addFrom('noreply@fo.com', 'Test')
             ->setSubject('A mail')
-            ->addVariables(['title' => 'My title'])
-            ->addContentAsFluidTemplateFileHtml('EXT:templatedmail/Resources/Private/Templates/Examples/Example.html')
+            ->context(['title' => 'My title'])
+            ->htmlTemplateFile('EXT:templatedmail/Resources/Private/Templates/Examples/Example.html')
             ->send();
 
         $templatedEmail = GeneralUtility::makeInstance(TemplatedEmail::class);
@@ -83,9 +83,9 @@ class TemplateCommand extends Command
             ->addFrom('noreply@fo.com', 'Test')
             ->setSubject('A mail')
             ->setTemplateRootPaths(['EXT:dummy/Resources/Private/Templates/'])
-            ->addVariables(['title' => 'My title'])
-            ->addContentAsFluidTemplateHtml('Examples/Simple')
-            ->addContentAsFluidTemplatePlain('Examples/Simple')
+            ->context(['title' => 'My title'])
+            ->htmlTemplateName('Examples/Simple')
+            ->textTemplateName('Examples/Simple')
             ->send();
     }
 

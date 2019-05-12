@@ -15,8 +15,8 @@ $templatedMail = GeneralUtility::makeInstance(TemplatedEmail::class);
 $templatedMail->addTo('dummy@example.org')
     ->addFrom('noreply@fo.com', 'Test')
     ->setSubject('A mail')
-    ->addContentAsRaw('Hello' . LF . 'an example', TemplatedEmail::FORMAT_PLAIN)
-    ->addContentAsRaw('<h1>Hello</h1> an example', TemplatedEmail::FORMAT_HTML)
+    ->htmlContent('Hello' . LF . 'an example')
+    ->textContent('<h1>Hello</h1> an example')
     ->send();
 ```
 The example can also be called by CLI with `./web/bin/typo3 mail:template`.
@@ -40,7 +40,8 @@ $templatedEmail = GeneralUtility::makeInstance(TemplatedEmail::class);
 $templatedEmail->addTo('reciepient@example.org')
     ->addFrom('noreply@fo.com', 'Test')
     ->setSubject('A mail')
-    ->addContentAsFluidTemplateFile('EXT:templatedmail/Resources/Private/Templates/Examples/Example.html', ['title' => 'My title'], TemplatedEmail::FORMAT_HTML)
+    ->context(['title' => 'My title'])
+    ->htmlTemplateFile('EXT:templatedmail/Resources/Private/Templates/Examples/Example.html')
     ->send();
 ```
 
@@ -52,8 +53,9 @@ $templatedEmail->addTo('dummy@example.org')
     ->addFrom('noreply@fo.com', 'Test')
     ->setSubject('A mail')
     ->setTemplateRootPaths(['EXT:dummy/Resources/Private/Templates/'])
-    ->addContentAsFluidTemplate('Examples/Simple', ['title' => 'My title'], TemplatedEmail::FORMAT_HTML)
-    ->addContentAsFluidTemplate('Examples/Simple', ['title' => 'My title'], TemplatedEmail::FORMAT_PLAIN)
+    ->context(['title' => 'My title'])
+    ->htmlTemplateName('Examples/Simple')
+    ->textTemplateName('Examples/Simple')
     ->send();
 ```
 
