@@ -21,14 +21,16 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Mime\NamedAddress;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
+use TYPO3\CMS\Core\Mail\MailMessage;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class TemplateCommand extends Command
 {
     /**
-     * Configure the command by defining the name, options and arguments
+     * @inheritDoc
      */
     protected function configure()
     {
@@ -48,10 +50,11 @@ class TemplateCommand extends Command
         if ($site) {
             $templatedEmail->setSite($site);
         }
-        $templatedEmail->addTo('dummy@example.org')
-            ->addFrom('noreply@fo.com', 'Test')
+        $templatedEmail
+            ->to('dummy@example.org')
+            ->from(new NamedAddress('noreply@example.org', 'TYPO3'))
             ->setLanguage('fr')
-            ->setSubject('A mail')
+            ->subject('A mail')
             ->htmlContent('<h1>Hello</h1> an example')
             ->textContent('Hello' . LF . 'an example')
             ->send();
@@ -63,25 +66,28 @@ class TemplateCommand extends Command
     private function examples()
     {
         $templatedMail = GeneralUtility::makeInstance(TemplatedEmail::class);
-        $templatedMail->addTo('dummy@example.org')
-            ->addFrom('noreply@fo.com', 'Test')
-            ->setSubject('A mail')
+        $templatedMail
+            ->to('dummy@example.org')
+            ->from(new NamedAddress('noreply@example.org', 'TYPO3'))
+            ->subject('A mail')
             ->htmlContent('Hello' . LF . 'an example')
             ->textContent('<h1>Hello</h1> an example')
             ->send();
 
         $templatedEmail = GeneralUtility::makeInstance(TemplatedEmail::class);
-        $templatedEmail->addTo('reciepient@example.org')
-            ->addFrom('noreply@fo.com', 'Test')
-            ->setSubject('A mail')
+        $templatedEmail
+            ->to('dummy@example.org')
+            ->from(new NamedAddress('noreply@example.org', 'TYPO3'))
+            ->subject('A mail')
             ->context(['title' => 'My title'])
             ->htmlTemplateFile('EXT:templatedmail/Resources/Private/Templates/Examples/Example.html')
             ->send();
 
         $templatedEmail = GeneralUtility::makeInstance(TemplatedEmail::class);
-        $templatedEmail->addTo('dummy@example.org')
-            ->addFrom('noreply@fo.com', 'Test')
-            ->setSubject('A mail')
+        $templatedEmail
+            ->to('dummy@example.org')
+            ->from(new NamedAddress('noreply@example.org', 'TYPO3'))
+            ->subject('A mail')
             ->setTemplateRootPaths(['EXT:dummy/Resources/Private/Templates/'])
             ->context(['title' => 'My title'])
             ->htmlTemplateName('Examples/Simple')

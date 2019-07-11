@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace GeorgRinger\Templatedmail\Mail;
 
+use Symfony\Component\Mime\Header\Headers;
+use Symfony\Component\Mime\Part\AbstractPart;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Mail\MailMessage;
 use TYPO3\CMS\Core\Routing\SiteMatcher;
@@ -37,10 +39,9 @@ class TemplatedEmail extends MailMessage
     /** @var string */
     protected $language = '';
 
-    public function __construct($subject = null, $body = null, $contentType = null, $charset = null)
+    public function __construct(Headers $headers = null, AbstractPart $body = null)
     {
-        parent::__construct($subject, $body, $contentType, $charset);
-
+        parent::__construct($headers, $body);
         $this->view = GeneralUtility::makeInstance(StandaloneView::class);
 
         $path = GeneralUtility::getFileAbsFileName('EXT:templatedmail/Resources/Private/');
@@ -101,7 +102,7 @@ class TemplatedEmail extends MailMessage
         $this->init($format);
         $this->view->setTemplate($templateName . '.' . $format);
 
-        $this->setBody($this->view->render(), 'text/html');
+        $this->html($this->view->render());
         return $this;
     }
 
@@ -126,7 +127,7 @@ class TemplatedEmail extends MailMessage
         $this->init($format);
         $this->view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName($templateFile));
 
-        $this->setBody($this->view->render(), 'text/html');
+        $this->html($this->view->render());
         return $this;
     }
 
@@ -135,7 +136,7 @@ class TemplatedEmail extends MailMessage
         $this->init($format);
         $this->view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName($templateFile));
 
-        $this->addPart($this->view->render(), 'text/plain');
+        $this->text($this->view->render());
         return $this;
     }
 
@@ -158,9 +159,9 @@ class TemplatedEmail extends MailMessage
         $this->view->assign('content', $content);
 
         if ($format === self::FORMAT_HTML) {
-            $this->setBody($this->view->render(), 'text/html');
+            $this->html($this->view->render());
         } elseif ($format === self::FORMAT_PLAIN) {
-            $this->addPart($this->view->render(), 'text/plain');
+            $this->text($this->view->render());
         }
         return $this;
     }
