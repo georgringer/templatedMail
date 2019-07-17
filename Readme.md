@@ -15,7 +15,7 @@ This extension is a proof of concept how to improve the templating of mails.
 
 ## Usage
 
-```
+```php
 $templatedMail = GeneralUtility::makeInstance(TemplatedEmail::class);
 $templatedMail->addTo('dummy@example.org')
     ->addFrom('noreply@fo.com', 'Test')
@@ -37,7 +37,7 @@ This example will send one mail with the following parts:
 
 ### Using A template file
 
-```
+```php
 $templatedEmail = GeneralUtility::makeInstance(TemplatedEmail::class);
 $templatedEmail->addTo('reciepient@example.org')
     ->addFrom('noreply@fo.com', 'Test')
@@ -49,7 +49,7 @@ $templatedEmail->addTo('reciepient@example.org')
 
 ### Using A template
 
-```
+```php
 $templatedEmail = GeneralUtility::makeInstance(TemplatedEmail::class);
 $templatedEmail->addTo('dummy@example.org')
     ->addFrom('noreply@fo.com', 'Test')
@@ -65,7 +65,7 @@ $templatedEmail->addTo('dummy@example.org')
 
 The paths are configured in the site configuration
 
-```
+```yaml
 templatedMail:
   templateRootPath: EXT:templatedmail/Resources/Private/Templates/
   partialRootPath: EXT:templatedmail/Resources/Private/Partials/
