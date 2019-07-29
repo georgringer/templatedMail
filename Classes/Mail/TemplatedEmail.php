@@ -14,6 +14,7 @@ use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\IpAnonymizationUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
 class TemplatedEmail extends MailMessage
@@ -112,7 +113,7 @@ class TemplatedEmail extends MailMessage
         $this->init($format);
         $this->view->setTemplate($templateName . '.' . $format);
 
-        $this->addPart($this->view->render(), 'text/plain');
+        $this->text($this->view->render());
         return $this;
     }
 
@@ -124,7 +125,7 @@ class TemplatedEmail extends MailMessage
 
     public function htmlTemplateFile(string $templateFile): self
     {
-        $this->init($format);
+        $this->init('html');
         $this->view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName($templateFile));
 
         $this->html($this->view->render());
@@ -133,10 +134,10 @@ class TemplatedEmail extends MailMessage
 
     public function textTemplateFile(string $templateFile): self
     {
-        $this->init($format);
+        $this->init('txt');
         $this->view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName($templateFile));
 
-        $this->text($this->view->render());
+        $this->text(trim($this->view->render()));
         return $this;
     }
 
@@ -161,7 +162,7 @@ class TemplatedEmail extends MailMessage
         if ($format === self::FORMAT_HTML) {
             $this->html($this->view->render());
         } elseif ($format === self::FORMAT_PLAIN) {
-            $this->text($this->view->render());
+            $this->text(trim($this->view->render()));
         }
         return $this;
     }
