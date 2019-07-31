@@ -1,1 +1,1 @@
-Copyright © {f:format.date(date:'now',format:'Y')}, All rights reserved.
+Copyright © {f:format.date(date:'now', format:'Y')}, All rights reserved.

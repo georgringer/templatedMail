@@ -14,7 +14,6 @@ use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\IpAnonymizationUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
 class TemplatedEmail extends MailMessage
@@ -53,6 +52,7 @@ class TemplatedEmail extends MailMessage
 
     /**
      * @param array $layoutRootPaths
+     * @return TemplatedEmail
      */
     public function setLayoutRootPaths(array $layoutRootPaths): self
     {
@@ -62,6 +62,7 @@ class TemplatedEmail extends MailMessage
 
     /**
      * @param array $partialRootPaths
+     * @return TemplatedEmail
      */
     public function setPartialRootPaths(array $partialRootPaths): self
     {
@@ -71,6 +72,7 @@ class TemplatedEmail extends MailMessage
 
     /**
      * @param array $templateRootPaths
+     * @return TemplatedEmail
      */
     public function setTemplateRootPaths(array $templateRootPaths): self
     {
@@ -80,6 +82,7 @@ class TemplatedEmail extends MailMessage
 
     /**
      * @param SiteInterface $site
+     * @return TemplatedEmail
      */
     public function setSite(SiteInterface $site): self
     {
@@ -97,6 +100,10 @@ class TemplatedEmail extends MailMessage
         return $this;
     }
 
+    /**
+     * @param string $templateName
+     * @return TemplatedEmail
+     */
     public function htmlTemplateName(string $templateName): self
     {
         $this->initializeView(self::FORMAT_HTML);
@@ -106,6 +113,10 @@ class TemplatedEmail extends MailMessage
         return $this;
     }
 
+    /**
+     * @param string $templateName
+     * @return TemplatedEmail
+     */
     public function textTemplateName(string $templateName): self
     {
         $this->initializeView(self::FORMAT_PLAIN);
@@ -115,12 +126,20 @@ class TemplatedEmail extends MailMessage
         return $this;
     }
 
+    /**
+     * @param array $variables
+     * @return TemplatedEmail
+     */
     public function context(array $variables): self
     {
         $this->view->assignMultiple($variables);
         return $this;
     }
 
+    /**
+     * @param string $templateFile
+     * @return TemplatedEmail
+     */
     public function htmlByTemplate(string $templateFile): self
     {
         $this->initializeView(self::FORMAT_HTML);
@@ -130,6 +149,10 @@ class TemplatedEmail extends MailMessage
         return $this;
     }
 
+    /**
+     * @param string $templateFile
+     * @return TemplatedEmail
+     */
     public function textByTemplate(string $templateFile): self
     {
         $this->initializeView(self::FORMAT_PLAIN);
@@ -139,19 +162,35 @@ class TemplatedEmail extends MailMessage
         return $this;
     }
 
+    /**
+     * @param string $content
+     * @param string $templateName
+     * @return TemplatedEmail
+     */
     public function htmlContent(string $content, string $templateName = 'RawContent'): self
     {
-        $this->html($this->getContent($content, $templateName));
+        $this->html($this->getContent($content, $templateName, self::FORMAT_HTML));
         return $this;
     }
 
+    /**
+     * @param string $content
+     * @param string $templateName
+     * @return TemplatedEmail
+     */
     public function textContent(string $content, string $templateName = 'RawContent'): self
     {
-        $this->text($this->getContent($content, $templateName));
+        $this->text($this->getContent($content, $templateName, self::FORMAT_PLAIN));
         return $this;
     }
 
-    private function getContent(string $content, string $templateName): string
+    /**
+     * @param string $content
+     * @param string $templateName
+     * @param string $format
+     * @return string
+     */
+    private function getContent(string $content, string $templateName, string $format = self::FORMAT_PLAIN): string
     {
         $this->initializeView($format);
 
@@ -160,6 +199,9 @@ class TemplatedEmail extends MailMessage
         return $this->view->render();
     }
 
+    /**
+     * @param string $format
+     */
     protected function initializeView(string $format): void
     {
         $site = $this->site ?: $this->getCurrentSite();
