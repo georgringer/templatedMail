@@ -1,6 +1,5 @@
 <?php
 
-
 namespace GeorgRinger\Templatedmail\Tests\Unit\Mail;
 
 /**
