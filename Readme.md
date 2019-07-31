@@ -71,9 +71,10 @@ $templatedEmail
 ```php
 $templatedEmail = GeneralUtility::makeInstance(TemplatedEmail::class);
 $templatedEmail
-   ->to('dummy@example.org')
+    ->to('dummy@example.org')
     ->from(new NamedAddress('noreply@example.org', 'TYPO3'))
     ->subject('A mail')
+    ->setLanguage('de')
     ->context(['title' => 'My title'])
     ->htmlTemplateFile('EXT:templatedmail/Resources/Private/Templates/Examples/Example.html')
     ->send();
