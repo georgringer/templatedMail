@@ -100,6 +100,7 @@ class TemplateCommand extends Command
                 ->context([
                     'title' => 'T3DD'
                 ])
+                ->textTemplateFile('EXT:templatedmail/Resources/Private/Templates/Examples/MultiLanguage.txt')
                 ->htmlTemplateFile('EXT:templatedmail/Resources/Private/Templates/Examples/MultiLanguage.html')
                 ->send();
         }
@@ -121,7 +122,6 @@ class TemplateCommand extends Command
         $templatedEmail = $this->getTemplatedMail();
         $templatedEmail
             ->subject('Different template layout')
-            ->setTemplateRootPaths(['EXT:dummy/Resources/Private/Templates/'])
             ->context(['title' => 'My title'])
             ->htmlTemplateName('Examples/Simple')
             ->textTemplateName('Examples/Simple')

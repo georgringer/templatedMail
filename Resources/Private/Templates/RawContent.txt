@@ -4,8 +4,7 @@
 <f:layout name="Simple"/>
 
 <f:section name="content">
-	{content -> f:format.raw()}
+{content -> f:format.raw()}
 </f:section>
-
 
 </html>

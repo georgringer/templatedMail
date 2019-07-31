@@ -99,9 +99,8 @@ class TemplatedEmail extends MailMessage
 
     public function htmlTemplateName(string $templateName): self
     {
-        $format = self::FORMAT_HTML;
-        $this->init($format);
-        $this->view->setTemplate($templateName . '.' . $format);
+        $this->initializeView(self::FORMAT_HTML);
+        $this->view->setTemplate($templateName);
 
         $this->html($this->view->render());
         return $this;
@@ -109,9 +108,8 @@ class TemplatedEmail extends MailMessage
 
     public function textTemplateName(string $templateName): self
     {
-        $format = self::FORMAT_PLAIN;
-        $this->init($format);
-        $this->view->setTemplate($templateName . '.' . $format);
+        $this->initializeView(self::FORMAT_PLAIN);
+        $this->view->setTemplate($templateName);
 
         $this->text($this->view->render());
         return $this;
@@ -125,7 +123,7 @@ class TemplatedEmail extends MailMessage
 
     public function htmlTemplateFile(string $templateFile): self
     {
-        $this->init('html');
+        $this->initializeView(self::FORMAT_HTML);
         $this->view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName($templateFile));
 
         $this->html($this->view->render());
@@ -134,82 +132,79 @@ class TemplatedEmail extends MailMessage
 
     public function textTemplateFile(string $templateFile): self
     {
-        $this->init('txt');
+        $this->initializeView(self::FORMAT_PLAIN);
         $this->view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName($templateFile));
 
         $this->text(trim($this->view->render()));
         return $this;
     }
 
-    public function htmlContent(string $content, string $templateName = 'Default'): self
+    public function htmlContent(string $content, string $templateName = 'RawContent'): self
     {
-        $this->addContent($content, self::FORMAT_HTML, $templateName);
+        $this->html($this->getContent($content, $templateName));
         return $this;
     }
 
-    public function textContent(string $content, string $templateName = 'Default'): self
+    public function textContent(string $content, string $templateName = 'RawContent'): self
     {
-        $this->addContent($content, self::FORMAT_PLAIN, $templateName);
+        $this->text($this->getContent($content, $templateName));
         return $this;
     }
 
-    private function addContent(string $content, string $format, string $templateName): self
+    private function getContent(string $content, string $templateName): string
     {
-        $this->init($format);
-        $this->view->setTemplate($this->resolveLanguageSuffix($templateName, $format));
+        $this->initializeView($format);
+
+        $this->view->setTemplate($templateName);
         $this->view->assign('content', $content);
-
-        if ($format === self::FORMAT_HTML) {
-            $this->html($this->view->render());
-        } elseif ($format === self::FORMAT_PLAIN) {
-            $this->text(trim($this->view->render()));
-        }
-        return $this;
+        return $this->view->render();
     }
 
-    protected function resolveLanguageSuffix(string $template, string $format): string
+    protected function initializeView(string $format): void
     {
-        if ($this->language) { // todo add language
-            $path = $template . '.' . $format;
-        } else {
-            $path = $template . '.' . $format;
-        }
-
-        return $path;
-    }
-
-    protected function init(string $format): void
-    {
-        if (class_exists(Site::class)) {
-            $site = $this->site ?: $this->getCurrentSite();
-            if ($site) {
-                $configuration = $site->getConfiguration();
-                if (isset($configuration['templatedEmail'])) {
-                    foreach (['templateRootPaths', 'partialRootPaths', 'layoutRootPaths'] as $name) {
-                        $paths = $configuration['templatedEmail'][$name] ?? [];
-                        if ($paths) {
-                            $this->$name = $paths;
-                        }
+        $site = $this->site ?: $this->getCurrentSite();
+        if ($site) {
+            $configuration = $site->getConfiguration();
+            if (isset($configuration['templatedEmail'])) {
+                foreach (['templateRootPaths', 'partialRootPaths', 'layoutRootPaths'] as $name) {
+                    $paths = $configuration['templatedEmail'][$name] ?? [];
+                    if ($paths) {
+                        $this->$name = $paths;
                     }
                 }
             }
-            if (!$this->language) {
-                $siteLanguage = $this->getCurrentSiteLanguage();
-                if ($siteLanguage) {
-                    $this->language = $siteLanguage->getTwoLetterIsoCode();
-                }
-            }
-            $this->view->assign('site', $site);
-            $this->view->assign('siteLanguage', $siteLanguage);
+        }
+        if (!$this->language && $siteLanguage = $this->getCurrentSiteLanguage()) {
+            $this->language = $siteLanguage->getTwoLetterIsoCode();
         }
 
         $this->view->setLayoutRootPaths($this->layoutRootPaths);
         $this->view->setTemplateRootPaths($this->templateRootPaths);
         $this->view->setPartialRootPaths($this->partialRootPaths);
         $this->view->setFormat($format);
-        $this->view->assign('defaults', $this->getDefaultVariables());
 
-        $this->view->assign('language', $this->language);
+        $this->view->assignMultiple([
+            'defaults' => $this->getDefaultVariables(),
+            'language' => $this->language,
+            'site' => $site,
+            'siteLanguage' => $siteLanguage
+        ]);
+    }
+
+    /**
+     * @return array
+     */
+    protected function getDefaultVariables(): array
+    {
+        return [
+            'sitename' => $GLOBALS['TYPO3_CONF_VARS']['SYS']['sitename'],
+            'clientIp' => IpAnonymizationUtility::anonymizeIp(GeneralUtility::getIndpEnv(GeneralUtility::getIndpEnv('REMOTE_ADDR'))),
+            'language' => $this->language,
+            'formats' => [
+                'date' => $GLOBALS['TYPO3_CONF_VARS']['SYS']['ddmmyy'],
+                'time' => $GLOBALS['TYPO3_CONF_VARS']['SYS']['hhmm']
+            ]
+        ];
     }
 
     /**
@@ -245,17 +240,5 @@ class TemplatedEmail extends MailMessage
         && $request->getAttribute('language') instanceof SiteLanguage
             ? $request->getAttribute('language')
             : null;
-    }
-
-    /**
-     * @return array
-     */
-    protected function getDefaultVariables(): array
-    {
-        return [
-            'sitename' => $GLOBALS['TYPO3_CONF_VARS']['SYS']['sitename'],
-            'clientIp' => IpAnonymizationUtility::anonymizeIp(GeneralUtility::getIndpEnv(GeneralUtility::getIndpEnv('REMOTE_ADDR'))),
-            'language' => $this->language,
-        ];
     }
 }
