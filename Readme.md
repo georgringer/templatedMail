@@ -16,8 +16,8 @@ The plans are to ship this code with TYPO3 10 and provide the extension for 9x.
 ## Usage
 
 ```php
-$templatedMail = GeneralUtility::makeInstance(TemplatedEmail::class);
-$templatedMail
+$templatedEmail = GeneralUtility::makeInstance(TemplatedEmail::class);
+$templatedEmail
     ->to('dummy@example.org')
     ->from(new NamedAddress('noreply@example.org', 'TYPO3'))
     ->subject('A mail')
