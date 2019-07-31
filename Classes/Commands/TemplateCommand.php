@@ -100,8 +100,8 @@ class TemplateCommand extends Command
                 ->context([
                     'title' => 'T3DD'
                 ])
-                ->textTemplateFile('EXT:templatedmail/Resources/Private/Templates/Examples/MultiLanguage.txt')
-                ->htmlTemplateFile('EXT:templatedmail/Resources/Private/Templates/Examples/MultiLanguage.html')
+                ->textByTemplate('EXT:templatedmail/Resources/Private/Templates/Examples/MultiLanguage.txt')
+                ->htmlByTemplate('EXT:templatedmail/Resources/Private/Templates/Examples/MultiLanguage.html')
                 ->send();
         }
     }

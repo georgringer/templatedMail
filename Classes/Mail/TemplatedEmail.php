@@ -121,7 +121,7 @@ class TemplatedEmail extends MailMessage
         return $this;
     }
 
-    public function htmlTemplateFile(string $templateFile): self
+    public function htmlByTemplate(string $templateFile): self
     {
         $this->initializeView(self::FORMAT_HTML);
         $this->view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName($templateFile));
@@ -130,7 +130,7 @@ class TemplatedEmail extends MailMessage
         return $this;
     }
 
-    public function textTemplateFile(string $templateFile): self
+    public function textByTemplate(string $templateFile): self
     {
         $this->initializeView(self::FORMAT_PLAIN);
         $this->view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName($templateFile));

@@ -61,8 +61,8 @@ $templatedEmail
     ->setTemplateRootPaths(['EXT:dummy/Resources/Private/Templates/'])
     ->setLayoutRootPaths(['EXT:dummy/Resources/Private/Layouts/'])
     ->context(['title' => 'My title'])
-    ->htmlTemplateName('Examples/Simple')
-    ->textTemplateName('Examples/Simple')
+    ->htmlByTemplate('Examples/Simple')
+    ->textByTemplate('Examples/Simple')
     ->send();
 ```
 
