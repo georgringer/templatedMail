@@ -17,12 +17,17 @@
   ],
   "license": ["GPL-2.0-or-later"],
   "require": {
-    "typo3/cms-core": "^10",
-    "tijsverkoyen/css-to-inline-styles": "^2.2"
+    "tijsverkoyen/css-to-inline-styles": "^2.2",
+    "typo3/cms-core": "^10"
   },
   "autoload": {
     "psr-4": {
       "GeorgRinger\\Templatedmail\\": "Classes"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "GeorgRinger\\Templatedmail\\Tests\\": "Tests"
     }
   },
   "replace": {
@@ -34,5 +39,8 @@
       "cms-package-dir": "{$vendor-dir}/typo3/cms",
       "web-dir": ".Build/Web"
     }
+  },
+  "config": {
+    "sort-packages": true
   }
 }
