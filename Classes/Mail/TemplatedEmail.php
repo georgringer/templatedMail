@@ -254,7 +254,8 @@ class TemplatedEmail extends MailMessage
     {
         return [
             'sitename' => $GLOBALS['TYPO3_CONF_VARS']['SYS']['sitename'],
-            'clientIp' => IpAnonymizationUtility::anonymizeIp(GeneralUtility::getIndpEnv(GeneralUtility::getIndpEnv('REMOTE_ADDR')))
+            'clientIp' => IpAnonymizationUtility::anonymizeIp(GeneralUtility::getIndpEnv(GeneralUtility::getIndpEnv('REMOTE_ADDR'))),
+            'language' => $this->language,
         ];
     }
 }

@@ -18,6 +18,7 @@ namespace GeorgRinger\Templatedmail\Commands;
 
 use GeorgRinger\Templatedmail\Mail\TemplatedEmail;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -34,7 +35,8 @@ class TemplateCommand extends Command
      */
     protected function configure()
     {
-        $this->setDescription('Template mail');
+        $this->setDescription('Template mail')
+            ->addArgument('mode', InputArgument::OPTIONAL, 'Test mode');
     }
 
     /**
@@ -45,49 +47,80 @@ class TemplateCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $templatedEmail = GeneralUtility::makeInstance(TemplatedEmail::class);
-        $site = $this->getSiteByName('master');
-        if ($site) {
-            $templatedEmail->setSite($site);
+        $mailSent = false;
+        if ($input->getArgument('mode')) {
+            switch (strtolower($input->getArgument('mode'))) {
+                case 'multilang':
+                    $this->testMultiLanguage();
+                    $mailSent = true;
+                    break;
+                case 'simple':
+                    $this->testDefault();
+                    $mailSent = true;
+                    break;
+                case 'layout':
+                    $this->testDifferentTemplateLayouts();
+                    $mailSent = true;
+                    break;
+                case 'all':
+                    $this->testDefault();
+                    $this->testMultiLanguage();
+                    $this->testDifferentTemplateLayouts();
+                    $mailSent = true;
+                    break;
+            }
         }
+
+        $io = new SymfonyStyle($input, $output);
+        if ($mailSent) {
+            $io->success('Done');
+        } else {
+            $io->warning('No mail sent, use of the following modes: simple,multilang,layout,all');
+        }
+    }
+
+    protected function testDefault(): void
+    {
+        $templatedEmail = $this->getTemplatedMail();
         $templatedEmail
-            ->to('dummy@example.org')
-            ->from(new NamedAddress('noreply@example.org', 'TYPO3'))
-            ->setLanguage('fr')
             ->subject('A mail')
             ->htmlContent('<h1>Hello</h1> an example')
             ->textContent('Hello' . LF . 'an example')
             ->send();
-
-        $io = new SymfonyStyle($input, $output);
-        $io->success('Done');
     }
 
-    private function examples()
+    protected function testMultiLanguage(): void
     {
-        $templatedMail = GeneralUtility::makeInstance(TemplatedEmail::class);
-        $templatedMail
-            ->to('dummy@example.org')
-            ->from(new NamedAddress('noreply@example.org', 'TYPO3'))
-            ->subject('A mail')
-            ->htmlContent('Hello' . LF . 'an example')
-            ->textContent('<h1>Hello</h1> an example')
-            ->send();
+        $languages = ['en', 'de'];
+        foreach ($languages as $language) {
+            $templatedEmail = $this->getTemplatedMail();
+            $templatedEmail
+                ->setLanguage($language)
+                ->subject('Multilanguage mail in ' . $language)
+                ->context([
+                    'title' => 'T3DD'
+                ])
+                ->htmlTemplateFile('EXT:templatedmail/Resources/Private/Templates/Examples/MultiLanguage.html')
+                ->send();
+        }
+    }
 
+    protected function getTemplatedMail(): TemplatedEmail
+    {
         $templatedEmail = GeneralUtility::makeInstance(TemplatedEmail::class);
         $templatedEmail
+            ->setSite($this->getSiteByName('master'))
             ->to('dummy@example.org')
-            ->from(new NamedAddress('noreply@example.org', 'TYPO3'))
-            ->subject('A mail')
-            ->context(['title' => 'My title'])
-            ->htmlTemplateFile('EXT:templatedmail/Resources/Private/Templates/Examples/Example.html')
-            ->send();
+            ->from(new NamedAddress('noreply@example.org', 'TYPO3'));
 
-        $templatedEmail = GeneralUtility::makeInstance(TemplatedEmail::class);
+        return $templatedEmail;
+    }
+
+    protected function testDifferentTemplateLayouts(): void
+    {
+        $templatedEmail = $this->getTemplatedMail();
         $templatedEmail
-            ->to('dummy@example.org')
-            ->from(new NamedAddress('noreply@example.org', 'TYPO3'))
-            ->subject('A mail')
+            ->subject('Different template layout')
             ->setTemplateRootPaths(['EXT:dummy/Resources/Private/Templates/'])
             ->context(['title' => 'My title'])
             ->htmlTemplateName('Examples/Simple')

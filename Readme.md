@@ -1,30 +1,30 @@
 # TYPO3 extension `templatedMail`
 
 This extension is a proof of concept how to improve the templating of mails.
+The plans are to ship this code with TYPO3 10 and provide the extension for 9x.
 
-**Current Benefits**
+**Benefits**
 
-- All mails share the same layout which makes it easier to style mails
+- **All** mails share the same layout which makes it easier to style mails
 - It is faster to create nice mails
 
 ## Requirements
 
-- TYPO3 8, 9 or 10
+- TYPO3 10
 - PHP 7.2
-
 
 ## Usage
 
 ```php
 $templatedMail = GeneralUtility::makeInstance(TemplatedEmail::class);
-$templatedMail->addTo('dummy@example.org')
-    ->addFrom('noreply@fo.com', 'Test')
-    ->setSubject('A mail')
-    ->htmlContent('Hello' . LF . 'an example')
-    ->textContent('<h1>Hello</h1> an example')
+$templatedMail
+    ->to('dummy@example.org')
+    ->from(new NamedAddress('noreply@example.org', 'TYPO3'))
+    ->subject('A mail')
+    ->htmlContent('<h1>Hello</h1> an example')
+    ->textContent('Hello' . LF . 'an example')
     ->send();
 ```
-The example can also be called by CLI with `./web/bin/typo3 mail:template`.
 
 This example will send one mail with the following parts:
 
@@ -35,30 +35,54 @@ This example will send one mail with the following parts:
 
 ## Further examples
 
-### Using A template file
+The examples can also be called by CLI with `./web/bin/typo3 mail:template`.
+
+### Using a single template file
 
 ```php
 $templatedEmail = GeneralUtility::makeInstance(TemplatedEmail::class);
-$templatedEmail->addTo('reciepient@example.org')
-    ->addFrom('noreply@fo.com', 'Test')
-    ->setSubject('A mail')
+$templatedEmail
+    ->to('dummy@example.org')
+    ->from(new NamedAddress('noreply@example.org', 'TYPO3'))
+    ->subject('A mail')
     ->context(['title' => 'My title'])
     ->htmlTemplateFile('EXT:templatedmail/Resources/Private/Templates/Examples/Example.html')
     ->send();
 ```
 
-### Using A template
+### Using custom template paths
 
 ```php
 $templatedEmail = GeneralUtility::makeInstance(TemplatedEmail::class);
-$templatedEmail->addTo('dummy@example.org')
-    ->addFrom('noreply@fo.com', 'Test')
-    ->setSubject('A mail')
+$templatedEmail
+    ->to('dummy@example.org')
+    ->from(new NamedAddress('noreply@example.org', 'TYPO3'))
+    ->subject('A mail')
     ->setTemplateRootPaths(['EXT:dummy/Resources/Private/Templates/'])
+    ->setLayoutRootPaths(['EXT:dummy/Resources/Private/Layouts/'])
     ->context(['title' => 'My title'])
     ->htmlTemplateName('Examples/Simple')
     ->textTemplateName('Examples/Simple')
     ->send();
+```
+
+### Providing custom translations
+
+```php
+$templatedEmail = GeneralUtility::makeInstance(TemplatedEmail::class);
+$templatedEmail
+   ->to('dummy@example.org')
+    ->from(new NamedAddress('noreply@example.org', 'TYPO3'))
+    ->subject('A mail')
+    ->context(['title' => 'My title'])
+    ->htmlTemplateFile('EXT:templatedmail/Resources/Private/Templates/Examples/Example.html')
+    ->send();
+```
+
+```html
+<f:section name="content">
+	<h1>{f:translate(languageKey:defaults.language,key:'LLL:EXT:templatedmail/Resources/Private/Language/dummy.xml:good_morning')}, {title}</h1>
+</f:section>
 ```
 
 ## Configuration
@@ -73,3 +97,4 @@ templatedMail:
 ```
 
 If a mail is sent via CLI, the used site can be set with `$templatedEmail->setSite($site);`
+
