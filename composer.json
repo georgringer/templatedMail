@@ -17,7 +17,7 @@
   ],
   "license": ["GPL-2.0-or-later"],
   "require": {
-    "tijsverkoyen/css-to-inline-styles": "^2.2",
+    "elago/emogrifier": "^2.1",
     "typo3/cms-core": "^10"
   },
   "autoload": {

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace GeorgRinger\Templatedmail\ViewHelpers;
 
-use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
+use Pelago\Emogrifier;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
@@ -32,10 +32,11 @@ class InlineStylesViewHelper extends AbstractViewHelper
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext
     ): string {
-        $cssToInlineStyles = new CssToInlineStyles();
 
         $html = $renderChildrenClosure();
         $css = file_get_contents(GeneralUtility::getFileAbsFileName($arguments['css']));
-        return $cssToInlineStyles->convert($html, $css);
+
+        $emogrifier = new Emogrifier($html, $css);
+        return $emogrifier->emogrify();
     }
 }
