@@ -32,7 +32,6 @@ class InlineStylesViewHelper extends AbstractViewHelper
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext
     ): string {
-
         $html = $renderChildrenClosure();
         $css = file_get_contents(GeneralUtility::getFileAbsFileName($arguments['css']));
 

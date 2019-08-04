@@ -2,19 +2,18 @@
 
 namespace GeorgRinger\Templatedmail\ViewHelpers;
 
-use Vendor\Ext\MailMessage;
 use TYPO3\CMS\Core\Imaging\ImageManipulation\CropVariantCollection;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3Fluid\Fluid\Core\ViewHelper\Exception;
 use TYPO3\CMS\Fluid\ViewHelpers\ImageViewHelper;
+use TYPO3Fluid\Fluid\Core\ViewHelper\Exception;
+use Vendor\Ext\MailMessage;
 
 /**
  * Class MailImageViewHelper
  */
 class MailImageViewHelper extends ImageViewHelper
 {
-
     public function initializeArguments()
     {
         parent::initializeArguments();
@@ -88,5 +87,4 @@ class MailImageViewHelper extends ImageViewHelper
 
         return $this->tag->render();
     }
-
 }
