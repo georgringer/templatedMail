@@ -86,6 +86,24 @@ $templatedEmail
 </f:section>
 ```
 
+### Adding inline images
+
+Use the provided ViewHelper to attach images properly.
+
+```html
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:email="http://typo3.org/ns/GeorgRinger/Templatedmail/ViewHelpers"
+      data-namespace-typo3-fluid="true">
+
+<f:layout name="Simple"/>
+
+<f:section name="content">
+    <email:mailImage mail="{mailMessage}" src="fileadmin/my-files/CA191.JPG" width="100" />
+</f:section>
+</html>
+```
+
+
 ## Configuration
 
 The paths are configured in the site configuration

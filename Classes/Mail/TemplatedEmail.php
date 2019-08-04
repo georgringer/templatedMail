@@ -226,6 +226,7 @@ class TemplatedEmail extends MailMessage
         $this->view->setFormat($format);
 
         $this->view->assignMultiple([
+            'mailMessage' => $this,
             'defaults' => $this->getDefaultVariables(),
             'language' => $this->language,
             'site' => $site,
