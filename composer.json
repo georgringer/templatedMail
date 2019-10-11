@@ -1,7 +1,7 @@
 {
   "name": "georgringer/templatedmail",
   "type": "typo3-cms-extension",
-  "description": "Better mail templates",
+  "description": "Better HTML email templates",
   "keywords": [
     "TYPO3",
     "extension",
@@ -17,8 +17,12 @@
   ],
   "license": ["GPL-2.0-or-later"],
   "require": {
-    "elago/emogrifier": "^2.1",
+    "pelago/emogrifier": "^3.0",
     "typo3/cms-core": "^10"
+  },
+  "require-dev": {
+    "simonschaufi/typo3-support": "^1.0",
+    "typo3/testing-framework": "^5.0"
   },
   "autoload": {
     "psr-4": {
@@ -31,16 +35,24 @@
     }
   },
   "replace": {
-    "templatedmail": "self.version",
+    "georgringer/templatedmail": "self.version",
     "typo3-ter/templatedmail": "self.version"
   },
   "extra": {
     "typo3/cms": {
       "cms-package-dir": "{$vendor-dir}/typo3/cms",
-      "web-dir": ".Build/Web"
+      "web-dir": ".Build/Web",
+      "extension-key": "templatedmail"
     }
   },
+  "scripts": {
+    "post-autoload-dump": [
+      "TYPO3\\TestingFramework\\Composer\\ExtensionTestEnvironment::prepare"
+    ]
+  },
   "config": {
-    "sort-packages": true
+    "sort-packages": true,
+    "bin-dir": ".Build/bin",
+    "vendor-dir": ".Build/vendor"
   }
 }

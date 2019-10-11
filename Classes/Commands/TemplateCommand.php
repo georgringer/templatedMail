@@ -3,19 +3,6 @@ declare(strict_types=1);
 
 namespace GeorgRinger\Templatedmail\Commands;
 
-/*
- * This file is part of the TYPO3 CMS project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
- *
- * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- * The TYPO3 project - inspiring people to share!
- */
-
 use GeorgRinger\Templatedmail\Mail\TemplatedEmail;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -24,6 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Mime\NamedAddress;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
+use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -49,12 +37,12 @@ class TemplateCommand extends Command
         $mailSent = false;
         if ($input->getArgument('mode')) {
             switch (strtolower($input->getArgument('mode'))) {
-                case 'multilang':
-                    $this->testMultiLanguage();
-                    $mailSent = true;
-                    break;
                 case 'simple':
                     $this->testDefault();
+                    $mailSent = true;
+                    break;
+                case 'multilang':
+                    $this->testMultiLanguage();
                     $mailSent = true;
                     break;
                 case 'layout':
@@ -105,17 +93,6 @@ class TemplateCommand extends Command
         }
     }
 
-    protected function getTemplatedMail(): TemplatedEmail
-    {
-        $templatedEmail = GeneralUtility::makeInstance(TemplatedEmail::class);
-        $templatedEmail
-            ->setSite($this->getSiteByName('master'))
-            ->to('dummy@example.org')
-            ->from(new NamedAddress('noreply@example.org', 'TYPO3'));
-
-        return $templatedEmail;
-    }
-
     protected function testDifferentTemplateLayouts(): void
     {
         $templatedEmail = $this->getTemplatedMail();
@@ -127,7 +104,15 @@ class TemplateCommand extends Command
             ->send();
     }
 
-    protected function getSiteByName(string $identifier)
+    protected function getTemplatedMail(): TemplatedEmail
+    {
+        return GeneralUtility::makeInstance(TemplatedEmail::class)
+            ->setSite($this->getSiteByName('master'))
+            ->to('dummy@example.org')
+            ->from(new NamedAddress('noreply@example.org', 'TYPO3'));
+    }
+
+    protected function getSiteByName(string $identifier): ?Site
     {
         $site = null;
         try {
