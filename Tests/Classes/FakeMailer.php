@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GeorgRinger\Templatedmail\Tests\Classes;
 
+use PHPUnit\Framework\Assert as PHPUnit;
 use SimonSchaufi\TYPO3Support\Collection;
 use Symfony\Component\Mailer\DelayedSmtpEnvelope;
 use Symfony\Component\Mailer\Exception\TransportException;
@@ -13,7 +14,6 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\NamedAddress;
 use Symfony\Component\Mime\RawMessage;
-use PHPUnit\Framework\Assert as PHPUnit;
 use TYPO3\CMS\Core\Mail\Mailer;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\MailUtility;
@@ -21,7 +21,6 @@ use TYPO3\CMS\Core\Utility\MailUtility;
 /**
  * Class FakeMailer
  *
- * @package GeorgRinger\Templatedmail\Tests\Classes
  */
 class FakeMailer extends Mailer implements SingletonInterface
 {
