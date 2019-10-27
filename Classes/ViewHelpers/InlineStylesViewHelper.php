@@ -13,7 +13,9 @@ class InlineStylesViewHelper extends AbstractViewHelper
 {
     use CompileWithRenderStatic;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $escapeOutput = false;
 
     public function initializeArguments()
@@ -32,7 +34,6 @@ class InlineStylesViewHelper extends AbstractViewHelper
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext
     ): string {
-
         $html = $renderChildrenClosure();
         $css = file_get_contents(GeneralUtility::getFileAbsFileName($arguments['css']));
 
