@@ -1,7 +1,7 @@
 {
   "name": "georgringer/templatedmail",
   "type": "typo3-cms-extension",
-  "description": "Better mail templates",
+  "description": "Better HTML email templates",
   "keywords": [
     "TYPO3",
     "extension",
@@ -17,7 +17,7 @@
   ],
   "license": ["GPL-2.0-or-later"],
   "require": {
-    "elago/emogrifier": "^2.1",
+    "pelago/emogrifier": "^3.0",
     "typo3/cms-core": "^10"
   },
   "autoload": {
@@ -31,7 +31,7 @@
     }
   },
   "replace": {
-    "templatedmail": "self.version",
+    "georgringer/templatedmail": "self.version",
     "typo3-ter/templatedmail": "self.version"
   },
   "extra": {

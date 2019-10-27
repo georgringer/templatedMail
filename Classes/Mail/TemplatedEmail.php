@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GeorgRinger\Templatedmail\Mail;
 
+use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Part\AbstractPart;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
@@ -205,7 +206,7 @@ class TemplatedEmail extends MailMessage
     protected function initializeView(string $format): void
     {
         $site = $this->site ?: $this->getCurrentSite();
-        if ($site) {
+        if ($site instanceof Site) {
             $configuration = $site->getConfiguration();
             if (isset($configuration['templatedEmail'])) {
                 foreach (['templateRootPaths', 'partialRootPaths', 'layoutRootPaths'] as $name) {
@@ -256,7 +257,7 @@ class TemplatedEmail extends MailMessage
     protected function getCurrentSite(): ?SiteInterface
     {
         if ($GLOBALS['TYPO3_REQUEST'] instanceof ServerRequestInterface) {
-            return $GLOBALS['TYPO3_REQUEST']->getAttribute('site', null);
+            return $GLOBALS['TYPO3_REQUEST']->getAttribute('site');
         }
         if (is_object($GLOBALS['TSFE']) && MathUtility::canBeInterpretedAsInteger($GLOBALS['TSFE']->id) && $GLOBALS['TSFE']->id > 0) {
             $matcher = GeneralUtility::makeInstance(SiteMatcher::class);
@@ -279,8 +280,8 @@ class TemplatedEmail extends MailMessage
     {
         $request = $GLOBALS['TYPO3_REQUEST'] ?? null;
         return $request
-        && $request instanceof ServerRequestInterface
-        && $request->getAttribute('language') instanceof SiteLanguage
+               && $request instanceof ServerRequestInterface
+               && $request->getAttribute('language') instanceof SiteLanguage
             ? $request->getAttribute('language')
             : null;
     }
